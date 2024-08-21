@@ -1,0 +1,6 @@
+<b>Название:</b> {{ item.name }}
+<b>Тип участия:</b> {% if item.owner.id == data.event.from_user.id -%}
+Идейный вдохновитель
+{%- else %}
+Участник
+{%- endif -%}

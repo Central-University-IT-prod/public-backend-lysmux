@@ -1,0 +1,139 @@
+services:
+  bot:
+    build:
+      context: bot_service/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    user: app
+
+    environment:
+      BOT_TOKEN: secret
+
+      TRAVEL_SERVICE_HOST: travel_service
+      TRAVEL_SERVICE_PORT: 12345
+
+      RESOURCES_SERVICE_HOST: resources_service
+      RESOURCES_SERVICE_PORT: 12346
+
+      REDIS_HOST: redis
+      REDIS_PASSWORD: secret
+
+    networks:
+      - internal
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      resources_service:
+        condition: service_started
+      travel_service:
+        condition: service_started
+
+  resources_service:
+    build:
+      context: resources_service/
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+    user: app
+
+    environment:
+      SERVICE_PORT: 12346
+
+      FOURSQUARE_KEY: "secret"
+
+      REDIS_HOST: redis
+      REDIS_PASSWORD: secret
+
+    networks:
+      - internal
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  travel_service:
+    build:
+      context: travel_service/
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+    user: app
+
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_HOST: postgres
+      POSTGRES_DATABASE: travel_agent
+
+      REDIS_HOST: redis
+      REDIS_PASSWORD: secret
+
+      SERVICE_PORT: 12345
+
+    networks:
+      - internal
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+
+  postgres:
+    build:
+      context: postgres/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    user: postgres
+
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: "travel_agent"
+      POSTGRES_EXTENSIONS: "uuid-ossp"
+
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+    networks:
+      - internal
+
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    user: redis
+
+    sysctls:
+      - net.core.somaxconn=4096
+
+    command: --requirepass secret
+
+    volumes:
+      - redis-data:/data
+
+    networks:
+      - internal
+
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+
+networks:
+  internal:
+
+volumes:
+  db-data:
+  redis-data:

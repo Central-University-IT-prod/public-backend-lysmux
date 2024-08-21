@@ -1,0 +1,10 @@
+{% for segment in item.segments %}
+<b>Рейс:</b> {{ segment.flight_number }}
+<b>Авиакомпания:</b> {{ segment.company }}
+<b>Откуда:</b> {{ segment.departure_airport_name }} ({{ segment.departure_city_name }})
+<b>Куда:</b> {{ segment.arrival_airport_name }} ({{ segment.arrival_city_name }})
+<b>Время:</b> {{ segment.departure_at.strftime("%d.%m.%Y в %H:%M") }}
+{{ "|" if not loop.last else "" }}
+{% endfor -%}
+
+<b>Цена:</b> {{ item.price }}₽

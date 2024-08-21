@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "travel-service"
+version = "0.1.0"
+description = "Travel service for Travel Agent bot"
+authors = ["lysmux <kllraz@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+sqlalchemy = "^2.0.28"
+alembic = "^1.13.1"
+pydantic = "^2.6.4"
+pydantic-settings = "^2.2.1"
+asyncpg = "^0.29.0"
+uvicorn = {extras = ["standart"], version = "^0.28.0"}
+fastapi = "^0.110.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pyright = "^1.1.354"
+flake8 = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

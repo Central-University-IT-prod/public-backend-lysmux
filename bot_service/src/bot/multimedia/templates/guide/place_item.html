@@ -1,0 +1,11 @@
+<b>Название:</b> {{ item.name }}
+<b>Адрес:</b> <a href="https://yandex.ru/maps/?pt={{item.longitude}},{{item.latitude}}&z=17&l=map">{{ item.address }}</a>
+{%- if item.description +%}
+<b>Описание:</b> {{ item.description }}
+{%- endif %}
+{%- if item.rating +%}
+<b>Рейтинг:</b> {{ item.rating }}
+{%- endif %}
+{%- if item.price +%}
+<b>Цены:</b> {{ ("дёшевые", "умеренные", "дорогие", "очень дорогие")[item.price] }}
+{%- endif %}
